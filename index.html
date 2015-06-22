@@ -35,11 +35,11 @@
 <h3>
 <a id="lines-or-curves" class="anchor" href="#lines-or-curves" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lines or Curves</h3>
 
-<p>Suppose that instead of a point you calculate the minimum <a href="http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html">perpendicular distance of each point to a line</a>. This can be done using the same function <a href="https://github.com/rupertsmall/distance-heat-maps/blob/master/get_min_perp.m">get_min_perp.m</a> as the first example above. If your line is a <em>sin()</em> curve, say, then you might generate an image which looks something like this</p>
+<p>Suppose that instead of a point you calculate the minimum <a href="http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html">perpendicular distance of each point to a line</a>. This can be done using the same function <a href="https://github.com/rupertsmall/distance-heat-maps/blob/master/get_min_perp.m">get_min_perp.m</a> used to draw the first examples above. If your line is a <em>sin()</em> curve, say, then you might generate an image which looks something like this</p>
 
 <p><img src="https://cloud.githubusercontent.com/assets/7373621/8260102/5d8ae7ce-16b9-11e5-9b94-08179a7aa8c0.jpg" alt="distance to sin( ) curve"></p>
 
-<p>As before if you change the colour map used to fill in the colour of each pixels and take the <em>lognormal</em> of the distance instead (or any other function for that matter) you might get something like</p>
+<p>As before if you change the colour map used to fill in the colour of each pixels and take the <em>lognormal</em> of the distance instead (or any other <a href="http://mathworld.wolfram.com/Function.html">function</a> for that matter) you might get something like</p>
 
 <p><img src="https://cloud.githubusercontent.com/assets/7373621/8260100/5d8ace6a-16b9-11e5-8322-7423a67817aa.jpg" alt="distance to sin( ) with lognormal"></p>
 
@@ -54,14 +54,113 @@
 
 <p><img src="https://cloud.githubusercontent.com/assets/7373621/8260101/5d8b6154-16b9-11e5-93aa-862cdf911895.jpg" alt="distance to random with lognormal"></p>
 
+<p>The above introduces the basics. What if you want to draw more nuanced images? Without changing <a href="https://github.com/rupertsmall/distance-heat-maps/blob/master/get_min_perp.m">get_min_perp.m</a> you can</p>
+
+<ul>
+<li>Define more complex lines/curves from which the distance is calculated</li>
+<li>Take more complex functions of the distance</li>
+<li>Define your own colour maps</li>
+</ul>
+
+<h3>
+<a id="code" class="anchor" href="#code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code</h3>
+
+<p>All the code for the examples above are <a href="http://www.matlab.com">Maltab</a>/<a href="http://www.gnu.org/software/octave/">Octave</a></p>
+
+<h3>
+<a id="drawing-with-distance-code" class="anchor" href="#drawing-with-distance-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Drawing with Distance Code</h3>
+
+<p>Distance from a single point (0,0)</p>
+
+<pre><code>N = 1000;
+x = 0;
+y = 0;
+
+lower_x = min(x) -5; upper_x = max(x) +5; % for sensible window size
+lower_y = min(y) -5; upper_y = max(y) +5;
+[X Y] = meshgrid(linspace(lower_x, upper_x, N),linspace(lower_y, upper_y, N));
+% get minimum perpendicular distance
+dist = get_min_perp(x,y,X,Y,N);
+
+% plot results from get_min_perp for (0,0)
+figure
+h=pcolor(X,Y,dist);
+set(h,'EdgeColor','none')
+set(gcf,'Renderer','Zbuffer')
+colormap(hot)
+colorbar
+</code></pre>
+
+<p>Taking <em>sin()</em> of the distance and changing the colour pallet</p>
+
 <pre><code>figure
 h=pcolor(X,Y,sin(2*dist));
 set(h,'EdgeColor','none')
 set(gcf,'Renderer','Zbuffer')
 colormap(winter)
 colorbar
-hold on
+</code></pre>
 
+<h3>
+<a id="lines-and-curves-code" class="anchor" href="#lines-and-curves-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lines and Curves Code</h3>
+
+<p>Distance to <em>sin()</em> curve</p>
+
+<pre><code>x = linspace(0,5*pi,50);
+y = sin(x);
+
+lower_x = min(x); upper_x = max(x);
+lower_y = min(y); upper_y = max(y);
+[X Y] = meshgrid(linspace(lower_x, upper_x, N),linspace(lower_y, upper_y, N));
+dist = get_min_perp(x,y,X,Y,N);
+
+figure
+h=pcolor(X,Y,dist);
+set(h,'EdgeColor','none')
+set(gcf,'Renderer','Zbuffer')
+colormap(hot)
+colorbar
+</code></pre>
+
+<p><em>lognormal</em>(<em>5</em> x distance) to the <em>sin()</em> curve with altered colourmap</p>
+
+<pre><code>figure
+h=pcolor(X,Y,lognormal(5*dist));
+set(h,'EdgeColor','none')
+set(gcf,'Renderer','Zbuffer')
+colormap(winter)
+colorbar
+</code></pre>
+
+<h3>
+<a id="random-drawing-code" class="anchor" href="#random-drawing-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Random Drawing Code</h3>
+
+<p>Drawing using distance to randomly generated curve</p>
+
+<pre><code>x = rand(1,10);
+y = rand(1,10);
+
+lower_x = min(x); upper_x = max(x);
+lower_y = min(y); upper_y = max(y);
+[X Y] = meshgrid(linspace(lower_x, upper_x, N),linspace(lower_y, upper_y, N));
+dist = get_min_perp(x,y,X,Y,N);
+
+figure
+h=pcolor(X,Y,dist);
+set(h,'EdgeColor','none')
+set(gcf,'Renderer','Zbuffer')
+colormap(hot)
+colorbar
+</code></pre>
+
+<p>Changing the colour pallet and taking the <em>lognormal</em> of distance</p>
+
+<pre><code>figure
+h=pcolor(X,Y,lognormal(dist+1));
+set(h,'EdgeColor','none')
+set(gcf,'Renderer','Zbuffer')
+colormap(winter)
+colorbar
 </code></pre>
 
       <footer class="site-footer">
